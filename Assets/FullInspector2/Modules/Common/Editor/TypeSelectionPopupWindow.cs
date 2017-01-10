@@ -10,24 +10,36 @@ using UnityEngine;
 
 namespace FullInspector.Modules {
     public class TypeSelectionPopupWindow : ScriptableWizard {
+
+
+        // Restrict suggested types to this type
+        public Type superType;
+
         public Type InitialType;
         private Action<Type> _onSelectType;
         private bool _useGlobalFilter = true;
         private bool _showGenericTypes = false;
         private static Dictionary<Type, string> _typeNames = new Dictionary<Type, string>();
 
+        private List<Type> targetList;
 
-        public static TypeSelectionPopupWindow CreateSelectionWindow(Type initialType, Action<Type> onSelectType) {
-            var window = ScriptableWizard.DisplayWizard<TypeSelectionPopupWindow>("Type (with statics) Selector");
+        public static TypeSelectionPopupWindow CreateSelectionWindow(Type initialType, Type superType, Action<Type> onSelectType, bool limitToStatics = true) {
+            var window = ScriptableWizard.DisplayWizard<TypeSelectionPopupWindow>(limitToStatics ? "Type (with statics) Selector" : "Type Selector");
             window.InitialType = initialType;
             window.minSize = new Vector2(600, 500);
             window._onSelectType = onSelectType;
+            window.superType = superType;
+
+            targetList = (limitToStatics ? _allTypesWithStatics : _allTypes);
+
             var filters = fiSettings.TypeSelectionDefaultFilters;
             if (filters != null) {
-                _filteredTypesWithStatics = (from type in _allTypesWithStatics
-                                             where filters.Any(t => type.FullName.ToUpper().Contains(t.ToUpper()))
-                                             select type).ToList();
+                targetList = (from type in targetList
+                              where filters.Any(t => type.FullName.ToUpper().Contains(t.ToUpper())) && (superType == null || superType.IsAssignableFrom(type))
+                              select type).ToList();
             } else {
+                if(superType != null)
+                    targetList = targetList.Where(t => superType.IsAssignableFrom(t)).ToList();
                 window._useGlobalFilter = false;
             }
 
@@ -39,15 +51,22 @@ namespace FullInspector.Modules {
             fiEditorUtility.ShouldInspectorRedraw.Pop();
         }
 
+        public static List<Type> AllTypes { get { return _allTypes; } }
+
         private static List<Type> _allTypesWithStatics;
         private static List<Type> _filteredTypesWithStatics;
 
+        private static List<Type> _allTypes;
+        private static List<Type> _filteredTypes;
+
         static TypeSelectionPopupWindow() {
             _allTypesWithStatics = new List<Type>();
+            _allTypes = new List<Type>();
             var blackList = fiSettings.TypeSelectionBlacklist;
 
             foreach (Assembly assembly in fiRuntimeReflectionUtility.GetUserDefinedEditorAssemblies()) {
-                foreach (Type type in assembly.GetTypesWithoutException()) {
+                foreach (Type type in assembly.GetTypesWithoutException()){
+                    _allTypes.add(type);
                     var inspected = InspectedType.Get(type);
                     if (inspected.IsCollection == false) {
                         var shouldAdd = blackList == null ||
@@ -65,6 +84,12 @@ namespace FullInspector.Modules {
                                     orderby type.CSharpName()
                                     orderby type.Namespace
                                     select type).ToList();
+
+
+            _allTypes = (from type in _allTypes
+                         orderby type.CSharpName()
+                         orderby type.Namespace
+                         select type).ToList();
         }
 
         private Vector2 _scrollPosition;
@@ -146,7 +171,7 @@ namespace FullInspector.Modules {
                 GUILayout.EndHorizontal();
             }
 
-            foreach (Type type in (!_useGlobalFilter|| _filteredTypesWithStatics == null) ? _allTypesWithStatics : _filteredTypesWithStatics) {
+            foreach (Type type in targetList) {
                 if (PassesSearchFilter(type)) {
                     _displayedTypes++;
 

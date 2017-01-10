@@ -7,6 +7,14 @@ using UnityEngine;
 namespace FullInspector.Modules {
     [CustomPropertyEditor(typeof(Type))]
     public class TypePropertyEditor : PropertyEditor<Type> {
+
+        public class TypeLookupOptions : IGraphMetadataItemNotPersistent{
+            // To which super Type we need to restrict options
+            public Type superType;
+            // Whether we should only display Types with statics
+            public bool staticsOnly = true;
+        }
+
         public class StateObject : IGraphMetadataItemNotPersistent {
             public fiOption<Type> Type;
         }
@@ -25,9 +33,10 @@ namespace FullInspector.Modules {
             }
 
             StateObject stateObj = metadata.GetMetadata<StateObject>();
+            TypeLookupOptions options = metadata.GetInheritedMetadata<TypeLookupOptions>();
 
             if (GUI.Button(buttonRect, displayed)) {
-                TypeSelectionPopupWindow.CreateSelectionWindow(element, type => stateObj.Type = fiOption.Just(type));
+                TypeSelectionPopupWindow.CreateSelectionWindow(element, options.superType, type => stateObj.Type = fiOption.Just(type), options.staticsOnly);
             }
 
             if (stateObj.Type.HasValue) {
