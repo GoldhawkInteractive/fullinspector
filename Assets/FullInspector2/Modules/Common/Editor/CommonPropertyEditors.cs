@@ -250,4 +250,75 @@ namespace FullInspector.Modules {
             return EditorStyles.label.CalcHeight(label, 1000);
         }
     }
+
+    [CustomPropertyEditor(typeof(Quaternion))]
+    public class QuaternionPropertyEditor : PropertyEditor<Quaternion>
+    {
+
+        private class QuaternionMetaData : IGraphMetadataItemNotPersistent
+        {
+            public bool setup;
+            public bool editAsEuler = true;
+            public Vector3 eulerAngles;
+            public Vector4 raw;
+
+            public void Setup(Quaternion element)
+            {
+                setup = true;
+                eulerAngles = element.eulerAngles;
+                raw = new Vector4(element.x, element.y, element.z, element.w);
+            }
+        }
+
+        public override Quaternion Edit(Rect region, GUIContent label, Quaternion element, fiGraphMetadata metadata)
+        {
+            var qMeta = metadata.GetMetadata<QuaternionMetaData>();
+
+            var restHeight = region.height - 16;
+            region.height = 16;
+            var euler = EditorGUI.Toggle(region, "Euler Angles", qMeta.editAsEuler);
+
+            // Reconstruct the stored one
+            if (qMeta.editAsEuler != euler || !qMeta.setup)
+            {
+                qMeta.Setup(element);
+                qMeta.editAsEuler = euler;
+            }
+
+            region.height = restHeight;
+            region.y += 16;
+
+            if (qMeta.editAsEuler)
+            {
+                EditorGUI.BeginChangeCheck();
+                qMeta.eulerAngles = EditorGUI.Vector3Field(region, label.text, qMeta.eulerAngles);
+
+                if (EditorGUI.EndChangeCheck())
+                {
+                    element.eulerAngles = qMeta.eulerAngles;
+                }
+            }
+            else
+            {
+                EditorGUI.BeginChangeCheck();
+                qMeta.raw = EditorGUI.Vector4Field(region, label.text, qMeta.raw);
+
+                if (EditorGUI.EndChangeCheck())
+                {
+                    element.Set(qMeta.raw.x, qMeta.raw.y, qMeta.raw.z, qMeta.raw.w);
+                }
+            }
+
+            return element;
+        }
+
+        public override float GetElementHeight(GUIContent label, Quaternion element, fiGraphMetadata metadata)
+        {
+            var qMeta = metadata.GetMetadata<QuaternionMetaData>();
+            return EditorStyles.numberField.CalcHeight(GUIContent.none, 1000)
+                + EditorStyles.label.CalcHeight(label, 1000) + 4
+                + (!qMeta.editAsEuler ? EditorStyles.label.CalcHeight(label, 1000) : 0);
+        }
+    }
+
 }
