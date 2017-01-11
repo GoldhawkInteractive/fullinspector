@@ -30,16 +30,16 @@ namespace FullInspector.Modules {
             window._onSelectType = onSelectType;
             window.superType = superType;
 
-            targetList = (limitToStatics ? _allTypesWithStatics : _allTypes);
+            window.targetList = (limitToStatics ? _allTypesWithStatics : _allTypes);
 
             var filters = fiSettings.TypeSelectionDefaultFilters;
             if (filters != null) {
-                targetList = (from type in targetList
+                window.targetList = (from type in window.targetList
                               where filters.Any(t => type.FullName.ToUpper().Contains(t.ToUpper())) && (superType == null || superType.IsAssignableFrom(type))
                               select type).ToList();
             } else {
                 if(superType != null)
-                    targetList = targetList.Where(t => superType.IsAssignableFrom(t)).ToList();
+                    window.targetList = window.targetList.Where(t => superType.IsAssignableFrom(t)).ToList();
                 window._useGlobalFilter = false;
             }
 
@@ -66,7 +66,7 @@ namespace FullInspector.Modules {
 
             foreach (Assembly assembly in fiRuntimeReflectionUtility.GetUserDefinedEditorAssemblies()) {
                 foreach (Type type in assembly.GetTypesWithoutException()){
-                    _allTypes.add(type);
+                    _allTypes.Add(type);
                     var inspected = InspectedType.Get(type);
                     if (inspected.IsCollection == false) {
                         var shouldAdd = blackList == null ||
