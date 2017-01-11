@@ -88,8 +88,8 @@ namespace FullInspector.Internal {
         /// Should the item added to the collection be customized *before* adding
         /// it?
         /// </summary>
-        protected virtual bool DisplayAddItemPreview {
-            get { return true; }
+        protected virtual bool DisplayAddItemPreview{
+            get { return (_listFlags & ReorderableListFlags.HideAddCustomizationButton) == 0; }
         }
 
         /// <summary>

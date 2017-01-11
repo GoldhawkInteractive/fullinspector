@@ -19,6 +19,12 @@ namespace FullInspector {
             set { UpdateFlag(value, ReorderableListFlags.HideAddButton); }
         }
 
+        public bool HideAddItemCustomizationField
+        {
+            get { return HasFlag(ReorderableListFlags.HideAddCustomizationButton); }
+            set { UpdateFlag(value, ReorderableListFlags.HideAddCustomizationButton); }
+        }
+
         public bool HideRemoveButtons {
             get { return HasFlag(ReorderableListFlags.HideRemoveButtons); }
             set { UpdateFlag(value, ReorderableListFlags.HideRemoveButtons); }

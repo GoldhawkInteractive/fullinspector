@@ -48,5 +48,9 @@ namespace FullInspector.Rotorz.ReorderableList {
         /// </para>
         /// </remarks>
         DisableClipping = 0x80,
+        /// <summary>
+        /// Hide customization field for an item to be added at base of control.
+        /// </summary>
+        HideAddCustomizationButton = 0x100,
     }
 }
