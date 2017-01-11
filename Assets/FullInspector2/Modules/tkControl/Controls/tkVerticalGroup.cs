@@ -34,6 +34,14 @@ namespace FullInspector {
                 }
             }
 
+            public void Add(int margin, tkControl<T, TContext> rule){
+                InternalAdd(new Margin(margin, rule));
+            }
+
+            public void Add(int left, int top, tkControl<T, TContext> rule){
+                InternalAdd(new Margin(left, top, rule));
+            }
+
             public void Add(tkControl<T, TContext> rule) {
                 InternalAdd(rule);
             }

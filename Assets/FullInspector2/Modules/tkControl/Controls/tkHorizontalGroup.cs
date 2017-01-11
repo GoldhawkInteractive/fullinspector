@@ -107,6 +107,14 @@ namespace FullInspector {
             }
 
             /// <summary>
+            /// Create an rule with auto width with the given weight.
+            /// </summary>
+            public void Add(tkControl<T, TContext> rule, float weight)
+            {
+                InternalAdd(false, 0, weight, rule);
+            }
+
+            /// <summary>
             /// Create a rule with auto width that can control if it matches the
             /// parent height.
             /// </summary>
