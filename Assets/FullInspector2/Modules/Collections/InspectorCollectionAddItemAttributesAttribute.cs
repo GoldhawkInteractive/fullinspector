@@ -24,5 +24,10 @@ namespace FullInspector {
             var instance = (fiICollectionAttributeProvider)Activator.CreateInstance(attributes);
             AttributeProvider = fiAttributeProvider.Create(instance.GetAttributes().ToArray());
         }
+
+        public InspectorCollectionAddItemAttributesAttribute(MemberInfo attributeProvider)
+        {
+            AttributeProvider = attributeProvider;
+        }
     }
 }

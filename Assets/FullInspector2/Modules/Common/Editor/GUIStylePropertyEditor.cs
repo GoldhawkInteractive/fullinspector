@@ -7,7 +7,7 @@ using tk = FullInspector.tk<UnityEngine.GUIStyle>;
 namespace FullInspector.Modules {
     [CustomPropertyEditor(typeof(GUIStyle))]
     public class GUIStylePropertyEditor : tkControlPropertyEditor<GUIStyle> {
-        public GUIStylePropertyEditor(Type dataType, ICustomAttributeProvider attr) : base(dataType) {
+        public GUIStylePropertyEditor(Type dataType, ICustomAttributeProvider attr) : base(dataType, attr) {
         }
 
         protected override tkControlEditor GetControlEditor(GUIContent label, GUIStyle element, fiGraphMetadata graphMetadata) {

@@ -7,7 +7,7 @@ using tk = FullInspector.tk<UnityEngine.RectOffset>;
 namespace FullInspector.Modules {
     [CustomPropertyEditor(typeof(RectOffset))]
     public class RectOffsetPropertyEditor : tkControlPropertyEditor<RectOffset> {
-        public RectOffsetPropertyEditor(Type dataType, ICustomAttributeProvider attr) : base(dataType) {
+        public RectOffsetPropertyEditor(Type dataType, ICustomAttributeProvider attr) : base(dataType, attr) {
         }
 
         protected override tkControlEditor GetControlEditor(GUIContent label, RectOffset element, fiGraphMetadata graphMetadata) {

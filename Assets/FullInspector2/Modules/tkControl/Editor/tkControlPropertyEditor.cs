@@ -11,7 +11,7 @@ namespace FullInspector.Internal {
     /// values popualted.
     /// </summary>
     public abstract class tkControlPropertyEditor<TEdited> : tkControlPropertyEditor {
-        public tkControlPropertyEditor(Type dataType) : base(dataType) {
+        public tkControlPropertyEditor(Type dataType, ICustomAttributeProvider provider) : base(dataType) {
         }
 
         public override bool CanEdit(Type dataType) {

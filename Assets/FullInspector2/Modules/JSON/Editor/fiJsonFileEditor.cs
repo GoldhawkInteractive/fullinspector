@@ -38,7 +38,7 @@ namespace FullInspector.Internal {
 
     [CustomPropertyEditor(typeof(fsData))]
     public class fsDataPropertyEditor : tkControlPropertyEditor<fsData> {
-        public fsDataPropertyEditor(Type dataType, ICustomAttributeProvider attrs) : base(dataType) {
+        public fsDataPropertyEditor(Type dataType, ICustomAttributeProvider attrs) : base(dataType, attrs) {
         }
 
         private static readonly tkControlEditor Editor = new tkControlEditor(
