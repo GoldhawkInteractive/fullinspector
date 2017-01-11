@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FullSerializer;
 using FullSerializer.Internal;
+using UnityEngine;
 
 namespace FullInspector.Internal {
     public static class fiReflectionUtility {
@@ -13,13 +14,17 @@ namespace FullInspector.Internal {
         /// cache is automatically destroyed upon assembly loads.
         /// </summary>
         private static Dictionary<Type, List<DisplayedType>> _creatableTypeCache;
+
         public struct DisplayedType {
+
             public Type Type;
             public string DisplayName;
+            public GUIContent Content;
 
             public DisplayedType(Type type) {
                 Type = type;
                 DisplayName = string.Empty;
+                Content = GUIContent.none;
 
                 var attr = fsPortableReflection.GetAttribute<InspectorDropdownNameAttribute>(type, /*shouldCache:*/false);
                 if (attr != null)

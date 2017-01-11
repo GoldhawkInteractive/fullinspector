@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FullInspector.Modules.Common;
 using FullSerializer;
 using FullSerializer.Internal;
 using UnityEngine;
@@ -12,8 +13,8 @@ namespace FullInspector.Internal {
     /// selection drop-down.
     /// </summary>
     internal class TypeDropdownOptionsManager {
+
         private List<DisplayedType> _options;
-        private List<GUIContent> _displayedOptions;
 
         /// <summary>
         /// Setup the instance option manager for the given type.
@@ -24,10 +25,14 @@ namespace FullInspector.Internal {
             else
                 _options = fiReflectionUtility.GetCreatableTypesDeriving(baseType);
 
-            _displayedOptions = new List<GUIContent>();
-            _displayedOptions.Add(new GUIContent("null (" + baseType.CSharpName() + ")"));
-            _displayedOptions.AddRange(from option in _options
-                                       select GetOptionName(option, !allowUncreatableTypes));
+            _options.ForEach(e => e.Content = new GUIContent(e.DisplayName));
+
+            _options.Insert(0, new DisplayedType
+            {
+                Type = null,
+                DisplayName = string.Empty,
+                Content = new GUIContent("null (" + baseType.CSharpName() + ")")
+            });
         }
 
         private static GUIContent GetOptionName(DisplayedType type, bool addSkipCtorMessage) {
@@ -43,24 +48,13 @@ namespace FullInspector.Internal {
         /// <summary>
         /// Returns an array of options that should be displayed.
         /// </summary>
-        public GUIContent[] GetDisplayOptions() {
-            return _displayedOptions.ToArray();
-        }
+        public GUIContent[] GetDisplayOptions(RestrictedTypeMetaData meta = null) {
+            // TODO: Cache on meta / internally
+            if (meta == null || meta.RestrictedTypes == null || !meta.RestrictedTypes.Any())
+                return _options.Select(type => type.Content).ToArray();
 
-        /// <summary>
-        /// Remove any options from the set of display options that are not
-        /// permanently visible.
-        /// </summary>
-        public void RemoveExtraneousOptions() {
-            // Figure out how long we want to be.
-            int desiredLength = 0;
-            desiredLength += 1; // null
-            desiredLength += _options.Count; // regular items
+            return _options.Where(content => content.Type == null || meta.IsAllowed(content.Type)).Select(type => type.Content).ToArray();
 
-            // Remove items until we are at the desired length.
-            while (_displayedOptions.Count > desiredLength) {
-                _displayedOptions.RemoveAt(_displayedOptions.Count - 1);
-            }
         }
 
         public Type GetTypeForIndex(int index, Type existingValue) {
@@ -91,25 +85,35 @@ namespace FullInspector.Internal {
         /// Returns the index of the option that should be displayed (from
         /// GetDisplayOptions()) based on the current object instance.
         /// </summary>
-        public int GetDisplayOptionIndex(object instance) {
+        public int GetDisplayOptionIndex(object instance, RestrictedTypeMetaData meta) {
             if (instance == null) {
                 return 0;
             }
+            
 
-            int offset = 1;
-
-            // try the regular options
+            int offsetI = 0;
             Type instanceType = instance.GetType();
-            for (int i = 0; i < _options.Count; ++i) {
+            for (int i = 1; i < _options.Count; ++i)
+            {
                 Type option = _options[i].Type;
-                if (instanceType == option) {
-                    return offset + i;
+
+                // Calculate the offset into the list, because these types could be filtered out.
+                if (option != null && !meta.IsAllowed(option)) offsetI++;
+
+                if (instanceType == option){
+                    return i - offsetI;
                 }
             }
 
             // we need a new display option
-            _displayedOptions.Add(new GUIContent(instance.GetType().CSharpName() + " (cannot reconstruct)"));
-            return _displayedOptions.Count - 1;
+            _options.Add(new DisplayedType
+            {
+                Type = instance.GetType(),
+                DisplayName = instance.GetType().CSharpName(),
+                Content = new GUIContent(instance.GetType().CSharpName() + " (cannot reconstruct)")
+            });
+
+            return _options.Count - 1;
         }
 
         /// <summary>

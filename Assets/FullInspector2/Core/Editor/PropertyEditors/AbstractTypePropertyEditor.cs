@@ -1,4 +1,5 @@
 ﻿using System;
+using FullInspector.Modules.Common;
 using UnityEditor;
 using UnityEngine;
 
@@ -40,7 +41,7 @@ namespace FullInspector.Internal {
             try {
                 fiEditorGUI.AnimatedBegin(ref region, metadata);
 
-                _options.RemoveExtraneousOptions();
+                var restrictionParent = metadata.GetInheritedMetadata<RestrictedTypeMetaData>();
 
                 // draw the popup
                 {
@@ -51,8 +52,8 @@ namespace FullInspector.Internal {
                     region.y += popupRegion.height;
                     region.height -= popupRegion.height;
 
-                    int selectedIndex = _options.GetDisplayOptionIndex(element);
-                    int updatedIndex = EditorGUI.Popup(popupRegion, label, selectedIndex, _options.GetDisplayOptions());
+                    int selectedIndex = _options.GetDisplayOptionIndex(element, restrictionParent);
+                    int updatedIndex = EditorGUI.Popup(popupRegion, label, selectedIndex, _options.GetDisplayOptions(restrictionParent));
 
                     if (selectedIndex != updatedIndex) {
                         metadata.GetMetadata<AbstractTypeAnimationMetadata>().ChangedTypes = true;
