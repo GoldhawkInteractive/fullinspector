@@ -333,8 +333,14 @@ namespace FullInspector.Internal {
                 RevertPrefabContextMenu(region, context, property);
             }
 
+            var name = fsPortableReflection.GetAttribute<InspectorNameAttribute>(property.MemberInfo);
+
             // get the label / tooltip
-            GUIContent label = new GUIContent(property.DisplayName,
+            GUIContent label;
+            if (name != null && name.Hide)
+                label = GUIContent.none;
+            else
+                label = new GUIContent(property.DisplayName,
                                               InspectorTooltipAttribute.GetTooltip(property.MemberInfo));
 
             var editorChain = PropertyEditor.Get(property.StorageType, property.MemberInfo);

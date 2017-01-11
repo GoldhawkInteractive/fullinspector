@@ -14,6 +14,13 @@ namespace FullInspector {
         /// </summary>
         public string DisplayName;
 
+
+        /// <summary>
+        /// If set to true, will disable the drawing of a name label for inspected properties.
+        /// As a side effect, will collapse the block by removing indentation.
+        /// </summary>
+        public bool Hide;
+
         /// <summary>
         /// Set the name of the member.
         /// </summary>
