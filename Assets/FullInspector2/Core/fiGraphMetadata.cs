@@ -396,17 +396,17 @@ namespace FullInspector {
         /// chain
         /// </summary>
         /// <typeparam name="T">The type of metadata instance.</typeparam>
-        public T GetInheritedMetadata<T>() where T : IGraphMetadataItemNotPersistent, new() {
+        public T GetInheritedMetadata<T>(int limit = -1) where T : IGraphMetadataItemNotPersistent, new() {
             object val;
 
             if (_metadata.TryGetValue(typeof(T), out val)) {
                 return (T)val;
             }
-            else if (_parentMetadata == null) {
+            else if (_parentMetadata == null || limit == 0) {
                 return GetMetadata<T>();
             }
             else {
-                return _parentMetadata.GetInheritedMetadata<T>();
+                return _parentMetadata.GetInheritedMetadata<T>(Math.Min(-1, limit - 1));
             }
         }
 
