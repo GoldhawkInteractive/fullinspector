@@ -21,6 +21,13 @@ namespace FullInspector {
             }
 
             public Slider(
+                Func<T, float> min, Func<T, float> max,
+                Func<T, TContext, float> getValue, Action<T, TContext, float> setValue)
+                : this(fiGUIContent.Empty, min, max, getValue, setValue)
+            {
+            }
+
+            public Slider(
                 Value<fiGUIContent> label,
                 Value<float> min, Value<float> max,
                 Func<T, TContext, float> getValue, Action<T, TContext, float> setValue) {
