@@ -2,9 +2,9 @@
 
 namespace FullInspector {
     /// <summary>
-    /// Adds whitespace above the given field or property.
+    /// Adds whitespace above the given field, property or method (button).
     /// </summary>
-    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Method)]
     public class InspectorMarginAttribute : Attribute, IInspectorAttributeOrder {
         public int Margin;
 
